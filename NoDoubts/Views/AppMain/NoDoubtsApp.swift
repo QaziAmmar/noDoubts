@@ -11,7 +11,11 @@ import SwiftUI
 struct NoDoubtsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if AppHelper.helper.loadMyUser() != nil{
+                DashboardView()
+            }else{
+                LoginView()
+            }
         }
     }
 }

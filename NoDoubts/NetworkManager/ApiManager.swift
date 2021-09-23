@@ -24,7 +24,7 @@ struct ApiResponse<T: Codable>: Codable {
 
 class ApiManager {
     
-    static let baseUrl = "https://5f.megaxtudio.com/index.php/Auth/"
+    static let baseUrl = "https://nodoubt.megaxtudio.com/"
     
     class func URLResponse(_ url:String, method: HTTPMethod ,parameters: [String: Any]?, headers: String?,  withSuccess success: @escaping apiSuccess, withapiFiluer failure: @escaping apiFailure) {
         
@@ -34,12 +34,12 @@ class ApiManager {
 //        let userToken = UserDefaults.standard.string(forKey: "token") ?? ""
         
         let headersToken: HTTPHeaders = [
-            "ClientService": "ListC@rlIsT(;)*&-#$%",
-            "AuthKey": "#$%%^^S@fTy!@).(@^S@fTy!@).(@",
-            "token": UserDefaults.standard.string(forKey: UserDefaultEnum.token.rawValue) ?? ""
+            "Content-Type" : "application/json",
+            "Accept": "application/json"
+            
         ]
 
-        AF.request(completeUrl, method:method, parameters: parameters, encoding: URLEncoding.httpBody, headers:headersToken).validate(statusCode: 200..<600).responseData(completionHandler: {   respones in
+        AF.request(completeUrl, method:method, parameters: parameters, encoding: JSONEncoding.default,  headers:headersToken).validate(statusCode: 200..<600).responseData(completionHandler: {   respones in
             switch respones.result {
                 
             case .success(let value):

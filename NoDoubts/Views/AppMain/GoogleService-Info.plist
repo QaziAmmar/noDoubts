@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>99295727751-u8q59cd68u35lnaiqood5j1ragnp3phl.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.99295727751-u8q59cd68u35lnaiqood5j1ragnp3phl</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBY-raeh6cxtpzfaQaRdDirSKHt5Q7uMl0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>99295727751</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.mega.NoDoubts</string>
+	<key>PROJECT_ID</key>
+	<string>nodoubts</string>
+	<key>STORAGE_BUCKET</key>
+	<string>nodoubts.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:99295727751:ios:b77d75d15d7caba492a822</string>
+</dict>
+</plist>

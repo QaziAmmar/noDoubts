@@ -9,19 +9,22 @@ import SwiftUI
 
 struct RunningView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State var open = false
+    @State var popoverSize = CGSize(width: 100, height: 100)
+    @State private var MovetoAddRunning: Bool = false
     @ObservedObject var RunningView = RunningViewModel()
     var body: some View {
         loadView().onAppear(){
             RunningView.ApiCalling()
-        }
+        }.navigationBarHidden(true)
     }
 }
 
-struct RunningView_Previews: PreviewProvider {
-    static var previews: some View {
-        RunningView()
-    }
-}
+//struct RunningView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        RunningView()
+//    }
+//}
 //    MARK:- View Extension
 extension RunningView{
     func loadView() -> some View {
@@ -31,9 +34,10 @@ extension RunningView{
             ScrollView{
             AllRunningDetails()
             }
+            gotoAddRunning
             Spacer()
             
-        }.padding().navigationBarHidden(true)
+        }.modifier(BannerModifier(model: $RunningView.model)).padding()
         }
         
     }
@@ -58,10 +62,11 @@ extension RunningView{
                 
                 
                 Spacer()
-                    HStack(spacing: 22){
-                        Image("filter").resizable().frame(width: 28 , height: 28)
-                        Image("plusIcon").resizable().frame(width: 22 , height: 22)
-                    }.padding(.trailing , 20)
+                Button(action: {
+                    MovetoAddRunning.toggle()
+                }){
+                    Image("plusIcon").resizable().frame(width: 22 , height: 22).padding(.trailing, 20)
+                }
                     
                 
         }.frame(minWidth : 0 , maxWidth: .infinity ,alignment: .leading)
@@ -73,6 +78,14 @@ extension RunningView{
     }
     //MARK:- All strength details
     func AllRunningDetails() -> some View{
+        let h = VStack(spacing : 8) {
+        if (RunningView.Running?.data?.count == nil){
+            Text("No Data Found").padding().font(.custom("Poppins-Medium", size: 13))
+                .foregroundColor(Color.primary)
+        }else{
+            
+        
+        
         
         ForEach(RunningView.Running?.data?.indices ?? 0..<0 , id: \.self){ item in
             ZStack(alignment: .leading) {
@@ -105,7 +118,7 @@ extension RunningView{
                         .font(.custom("Poppins-Medium", size: 10))
                 }
                 HStack{
-                Text("20 August 2021")
+                    Text(RunningView.Running?.data?[item].date ?? "")
                     
                     .background(Color.white)
                     .foregroundColor(Color("light"))
@@ -123,6 +136,18 @@ extension RunningView{
         }
             
         }
+        }
+        }
+        return h
+    }
+    //MARK:- Linking
+    private var gotoAddRunning : some View {
+        
+        NavigationLink(destination: AddRunningView(value: $MovetoAddRunning),isActive: $MovetoAddRunning,
+                       label: {
+                        Text("")
+                       })
+        
     }
 }
 

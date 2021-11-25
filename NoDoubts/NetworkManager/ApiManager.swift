@@ -25,6 +25,7 @@ struct ApiResponse<T: Codable>: Codable {
 class ApiManager {
     
     static let baseUrl = "https://nodoubt.megaxtudio.com/"
+    static let SocialBaseUrl = "https://dewsy.megaxtudio.com/User/"
     
     class func URLResponse(_ url:String, method: HTTPMethod ,parameters: [String: Any]?, headers: String?,  withSuccess success: @escaping apiSuccess, withapiFiluer failure: @escaping apiFailure) {
         
@@ -52,5 +53,30 @@ class ApiManager {
         })
     }
     
+    class func SocialLogin(_ url:String, method: HTTPMethod ,parameters: [String: Any]?, headers: String?,  withSuccess success: @escaping apiSuccess, withapiFiluer failure: @escaping apiFailure) {
+        
+        var completeUrl : String = SocialBaseUrl + url
+        completeUrl = completeUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? completeUrl
+        print(completeUrl)
+//        let userToken = UserDefaults.standard.string(forKey: "token") ?? ""
+        
+        let headersToken: HTTPHeaders = [
+            "Content-Type" : "application/json",
+            "Accept": "application/json"
+            
+        ]
+
+        AF.request(completeUrl, method:method, parameters: parameters, encoding: JSONEncoding.default,  headers:headersToken).validate(statusCode: 200..<600).responseData(completionHandler: {   respones in
+            switch respones.result {
+                
+            case .success(let value):
+                print(respones.result)
+                success(value)
+                
+            case .failure(let error):
+                failure(error.localizedDescription)
+            }
+        })
+    }
 }
 

@@ -10,6 +10,9 @@ import SwiftUI
 struct StrengthDetailView: View {
     @ObservedObject var strengthList = StrengthViewModel()
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State var open = false
+    @State private var MoveToAddStrength: Bool = false
+    @State var popoverSize = CGSize(width: 100, height: 100)
     var body: some View {
         loadView().onAppear(){
             strengthList.ApiStrengthList()
@@ -28,7 +31,10 @@ extension StrengthDetailView{
         LoadingView(isShowing: $strengthList.loading) {
         VStack(alignment: .center) {
             BackButtonView()
+            ScrollView{
             allStrengthDetails()
+            }
+            goToAddStrength
             Spacer()
             
         }.padding().modifier(BannerModifier(model: $strengthList.model)).navigationBarHidden(true)
@@ -56,10 +62,45 @@ extension StrengthDetailView{
                 
                 
                 Spacer()
-                    HStack(spacing: 22){
-                        Image("filter").resizable().frame(width: 28 , height: 28)
-                        Image("plusIcon").resizable().frame(width: 22 , height: 22)
-                    }.padding(.trailing , 20)
+                Button(action: {
+                    MoveToAddStrength.toggle()
+                }){
+                    Image("plusIcon").resizable().frame(width: 22 , height: 22).padding(.trailing, 20)
+                }
+//                HStack(spacing: 22){
+////                        Image("filter").resizable().frame(width: 28 , height: 28)
+//                    WithPopover(
+//                        showPopover: $open,
+//                        content: {
+//                            Button(action: {
+//                                self.popoverSize = CGSize(width: 50, height: 50)
+//                                self.open.toggle()
+//
+//                            }) {
+//                                Image("filter").resizable().frame(width: 28 , height: 28)
+//                            }
+//                            //Spacer()
+//                        },
+//                        popoverContent: {
+//                            VStack {
+//                                Button(action: {
+//                                    self.open = false
+//
+//                                }) {
+//                                    Text("By Name").font(Font.system(size: 14 , weight: .regular)).foregroundColor(.black)
+//
+//                                }
+//                                Divider()
+//
+//                                Button(action: {
+//                                    self.open = false
+//                                }) {
+//                                    Text("By Date").font(Font.system(size: 14 , weight: .regular)).foregroundColor(.black)
+//                                }
+//                            }
+//                        })
+//
+//                }.padding(.trailing , 20)
                     
                 
         }.frame(minWidth : 0 , maxWidth: .infinity ,alignment: .leading)
@@ -71,6 +112,11 @@ extension StrengthDetailView{
     }
     //MARK:- All strength details
     func allStrengthDetails() -> some View{
+        let h = VStack(spacing : 8) {
+        if (strengthList.StrengthList?.data?.count == nil){
+            Text("No Strenght Data Found").padding().font(.custom("Poppins-Medium", size: 13))
+                .foregroundColor(Color.primary)
+        }else{
         
         ForEach(strengthList.StrengthList?.data?.indices ?? 0..<0 , id: \.self){ item in
             ZStack(alignment: .leading) {
@@ -113,4 +159,27 @@ extension StrengthDetailView{
             
         }
     }
+        }
+        return h
+}
+    
+    //MARK:- Link to Add Strength
+    private var goToAddStrength : some View {
+        
+        NavigationLink(destination: AddStrengthView(value: $MoveToAddStrength),isActive: $MoveToAddStrength,
+                       label: {
+                        Text("")
+                       })
+        
+    }
+    //MARK:- Linking
+//    private var gotoAddStrength : some View {
+//        
+//        NavigationLink(destination: AddRunningView(value: $MovetoAddRunning),isActive: $MovetoAddRunning,
+//                       label: {
+//                        Text("")
+//                       })
+//        
+//    }
+
 }

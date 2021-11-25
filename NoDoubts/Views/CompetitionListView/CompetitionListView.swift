@@ -9,6 +9,10 @@ import SwiftUI
 
 struct CompetitionListView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State var open = false
+    @State var popoverSize = CGSize(width: 100, height: 100)
+   
+    @State private var moveToCompetitionView: Bool = false
     @ObservedObject var competitionList = CompetitionListViewModel()
     var body: some View {
         loadView()
@@ -22,9 +26,11 @@ extension CompetitionListView{
             ScrollView{
             CompetitionList()
             }
+            gotoCompetitionView
             Spacer()
             
-        }.padding().onAppear(){
+        
+        }.modifier(BannerModifier(model: $competitionList.model)).padding().onAppear(){
             competitionList.ApiCalling()
         }.navigationBarHidden(true)
         }
@@ -51,10 +57,11 @@ extension CompetitionListView{
                 
                 
                 Spacer()
-                    HStack(spacing: 22){
-                        Image("filter").resizable().frame(width: 28 , height: 28)
-                        Image("plusIcon").resizable().frame(width: 22 , height: 22)
-                    }.padding(.trailing , 20)
+                Button(action: {
+                    moveToCompetitionView.toggle()
+                }){
+                    Image("plusIcon").resizable().frame(width: 22 , height: 22).padding(.trailing, 20)
+                }
                     
                 
         }.frame(minWidth : 0 , maxWidth: .infinity ,alignment: .leading)
@@ -66,6 +73,12 @@ extension CompetitionListView{
     }
     //MARK:- Competition List
     func CompetitionList() -> some View{
+        let h = VStack(spacing : 8) {
+        if (competitionList.Comp?.data?.count == nil){
+            Text("No Competition Found").padding().font(.custom("Poppins-Medium", size: 13))
+                .foregroundColor(Color.primary)
+            
+        }else{
         
         ForEach(competitionList.Comp?.data?.indices ?? 0..<0 , id: \.self){ item in
             ZStack(alignment: .leading) {
@@ -97,6 +110,19 @@ extension CompetitionListView{
         }
             
         }
+            
+    }
+        }
+        return h
+}
+    //MARK:- Linking
+    private var gotoCompetitionView : some View {
+        
+        NavigationLink(destination: CompetitionView(backToList: $moveToCompetitionView),isActive: $moveToCompetitionView,
+                       label: {
+                        Text("")
+                       })
+        
     }
 }
 

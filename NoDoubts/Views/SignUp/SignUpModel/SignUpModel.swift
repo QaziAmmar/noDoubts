@@ -46,3 +46,52 @@ struct SignUp : Codable {
                          case password = "password"
         }
 }
+struct socialLoginModel: Codable {
+    
+    let data : clientsDat?
+    let message : String?
+    let status : Bool?
+//    let shopId : Int?
+    enum CodingKeys: String, CodingKey {
+//        case shopId = "shop_id"
+        case message = "message"
+        case status = "status"
+        case data = "data"
+    }
+    
+}
+struct clientsDat : Codable {
+            let aCode : String?
+            let code : Int?
+            let createdAt : String?
+            let email : String?
+            let fCode : String?
+            let fbToken : String?
+            let gToken : String?
+            let id : Int?
+            let name : String?
+            let nationality : String?
+            let password : String?
+            let status : Int?
+            let userToken : String?
+            let userType : String?
+            let shoRergister : Int?
+    enum CodingKeys: String, CodingKey {
+                    case aCode = "a_code"
+                    case shoRergister = "shop_registered"
+                    case code = "code"
+                    case createdAt = "created_at"
+                    case email = "email"
+                    case fCode = "f_code"
+                    case fbToken = "fb_token"
+                    case gToken = "g_token"
+                    case id = "id"
+                    case name = "name"
+                    case nationality = "nationality"
+                    case password = "password"
+                    case status = "status"
+                    case userToken = "user_token"
+                    case userType = "user_type"
+            }
+}
+

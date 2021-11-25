@@ -6,21 +6,25 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct DashboardView: View {
     @State private var moveToRunningView: Bool = false
     @State private var moveToCompetitionView: Bool = false
     @State private var moveToGoalList: Bool = false
     @State private var moveToAboutUs: Bool = false
+    
     @State private var movetoStrengthList: Bool = false
     @State private var moveToProfileView: Bool = false
-    @ObservedObject var DashBoard = DashBoardViewModel()
+    @State private var userProfile: String = ""
+    @StateObject var DashBoard = DashBoardViewModel()
     var body: some View {
         NavigationView{
         LoadingView(isShowing: $DashBoard.loading) {
 //            ScrollView{
         VStack{
             imageSetting()
+            
             mainSetting().padding(.top , 0)
             runningSwimmingDetails().padding(.top , 0)
             SetGHoalButton()
@@ -32,10 +36,15 @@ struct DashboardView: View {
             gotoAboutUs
             gotoStrengthView
             gotoProfileView
-            }
+            }.hidden()
             Spacer()
+//        }
         }.onAppear(){
+            if DashBoard.isCalledApi{
             DashBoard.ApiDashBoard()
+            }
+           let profile = AppHelper.helper.loadMyUser()
+            userProfile = profile?.data?.image ?? ""
         }.navigationBarHidden(true).navigationBarBackButtonHidden(true)
 //            }
         }
@@ -49,7 +58,7 @@ struct DashboardView: View {
             Button(action: {
                 moveToProfileView.toggle()
                           }){
-            Image("Profile Picture").resizable().frame(width: 70 , height: 70).padding(.leading , 5)
+                WebImage(url:URL(string: userProfile)).resizable().placeholder(Image("Profile Picture")).clipShape(Circle()).shadow(radius: 4).frame(width: 70 , height: 70).padding(.leading , 5)
             }
         }.padding()
     }

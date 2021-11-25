@@ -57,7 +57,7 @@ extension ProfileView {
                         .frame(width: 30, height: 30, alignment: .center)
             })
            
-                    Text("Running")
+                    Text("Profile")
                         .font(.custom("Poppins-Bold", size: 16))
                         .foregroundColor(Color("head"))
                 
@@ -86,7 +86,7 @@ extension ProfileView {
     fileprivate func ProfileImage() -> some View {
         VStack(alignment: .leading){
             HStack(spacing: 12){
-                WebImage(url:URL(string: userprofile.UserProfile?.data?.image ?? "")).resizable() .clipShape(Circle()).shadow(radius: 4).frame(width: 70 , height: 70).padding(.leading , 5)
+                WebImage(url:URL(string: userprofile.UserProfile?.data?.image ?? "")).resizable().placeholder(Image("Profile Picture")) .clipShape(Circle()).shadow(radius: 4).frame(width: 70 , height: 70).padding(.leading , 5)
                 Text(userprofile.UserProfile?.data?.name ?? "").font(.custom("Poppins-Bold", size: 14))
                 
             }
@@ -95,33 +95,18 @@ extension ProfileView {
     //MARK:- Profile Data setting
     fileprivate func UserProfileData() -> some View {
         VStack(spacing: 22){
-        
-            HStack{
-                Text("Gender").font(.custom("Poppins-Bold", size: 12))
-                Spacer()
-                Text(userprofile.UserProfile?.data?.gender ?? "").font(.custom("Poppins-Regular", size: 12)).foregroundColor(Color("light"))
-                Image("Right").resizable().frame(width: 24 , height: 24)
-                
-            }
-            HStack{
-                Text("Age").font(.custom("Poppins-Bold", size: 12))
-                Spacer()
-                Text(userprofile.UserProfile?.data?.dateOfBirth ?? "").font(.custom("Poppins-Regular", size: 12)).foregroundColor(Color("light"))
-                Image("Right").resizable().frame(width: 24 , height: 24)
-                
-            }
             HStack{
                 Text("Email").font(.custom("Poppins-Bold", size: 12))
                 Spacer()
                 Text(userprofile.UserProfile?.data?.email ?? "").font(.custom("Poppins-Regular", size: 12)).foregroundColor(Color("light"))
-                Image("Right").resizable().frame(width: 24 , height: 24)
+//                Image("Right").resizable().frame(width: 24 , height: 24)
                 
             }
             HStack{
                 Text("Change Password").font(.custom("Poppins-Bold", size: 12))
                 Spacer()
                 Text("************").font(.custom("Poppins-Regular", size: 12)).foregroundColor(Color("light"))
-                Image("Right").resizable().frame(width: 24 , height: 24)
+//                Image("Right").resizable().frame(width: 24 , height: 24)
                 
             }
             HStack{
@@ -129,7 +114,7 @@ extension ProfileView {
                 Spacer()
                 Text(userprofile.UserProfile?.data?.fitnessLevel ??
             "" ).font(.custom("Poppins-Regular", size: 12)).foregroundColor(Color("light"))
-                Image("Right").resizable().frame(width: 24 , height: 24)
+//                Image("Right").resizable().frame(width: 24 , height: 24)
                 
             }
         
@@ -160,7 +145,7 @@ extension ProfileView {
     fileprivate func LogoutButton() -> some View {
         Button(action: {
             
-            
+            logOut()
             
         }, label: {
             Text("Logout")
@@ -174,6 +159,14 @@ extension ProfileView {
         })
         .frame( height: 50)
         .padding([.top], 5)
+    }
+    func logOut() {
+        if let window = UIApplication.shared.windows.first {
+               window.rootViewController = UIHostingController(rootView: LoginView())
+               window.endEditing(true)
+            AppHelper.helper.removeMyUser()
+               window.makeKeyAndVisible()
+           }
     }
     //MARK:- Link to Edit Profile
     private var goToEditProfile : some View {

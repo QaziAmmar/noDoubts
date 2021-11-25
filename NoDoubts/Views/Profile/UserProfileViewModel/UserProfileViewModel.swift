@@ -16,12 +16,17 @@ class UserProfileViewModel: ObservableObject{
         UserProfile = try UserProfileModel(from: decoder)
     }
     //MARK:- Strength  Api
+    
     func ApiUserProfile(){
         
             loading = true
+        guard let profile = AppHelper.helper.loadMyUser() else {
+            print("No user")
+            return
+        }
+        let userId = profile.data?.id ?? ""
             
-            ApiManager.URLResponse("api/Users/user?id=20", method: .get, parameters: nil, headers: nil) { competitions in
-                //            parse login data
+            ApiManager.URLResponse("api/Users/user?id=\(userId)", method: .get, parameters: nil, headers: nil) { competitions in
                 do {
                     let decoder = JSONDecoder()
                     let userProfileModel = try decoder.decode(UserProfileModel.self, from: competitions)
@@ -30,9 +35,7 @@ class UserProfileViewModel: ObservableObject{
                         self.loading = false
                         print(userProfileModel)
                         self.UserProfile = userProfileModel
-//                        self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
                     } else {
-                        //                    show error
                         self.model = BannerData(title: userProfileModel.message ?? "", message: userProfileModel.message, color: .red, image: "error")
                     }
                 } catch let error {

@@ -20,21 +20,22 @@ struct RunnigModel : Codable {
 }
 struct running : Codable {
 
-        let averageSpeed : String?
-        let distance : String?
-        let id : String?
-        let time : String?
-        let userId : String?
-        let createdat : String?
-        let data: String?
+    let averageSpeed : String?
+          let createdAt : String?
+          let date : String?
+          let distance : String?
+          let id : String?
+          let time : String?
+          let userId : String?
 
-        enum CodingKeys: String, CodingKey {
-                case averageSpeed = "average_speed"
-                case distance = "distance"
-                case id = "id"
-                case time = "time"
-                case userId = "user_id"
-                case createdat = "created_at"
-                case data = "data"
+          enum CodingKeys: String, CodingKey {
+                  case averageSpeed = "average_speed"
+                  case createdAt = "created_at"
+                  case date = "date"
+                  case distance = "distance"
+                  case id = "id"
+                  case time = "time"
+                  case userId = "user_id"
+          
         }
 }

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AllGoalListView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State private var MoveToGoalView: Bool = false
+    
     @ObservedObject var GoalList = GoalListViewModel()
     var body: some View {
         loadView()
@@ -23,8 +25,9 @@ extension AllGoalListView{
             CompetitionList()
             }
             Spacer()
+            goToGoalView
             
-        }.padding().onAppear(){
+        }.modifier(BannerModifier(model: $GoalList.model)).padding().onAppear(){
             GoalList.ApiGoalList()
         }.navigationBarHidden(true)
         }
@@ -52,8 +55,12 @@ extension AllGoalListView{
                 
                 Spacer()
                     HStack(spacing: 22){
+                        Button(action: {
+                            MoveToGoalView.toggle()
+                        }, label: {
                        
                         Image("plusIcon").resizable().frame(width: 22 , height: 22)
+                        })
                     }.padding(.trailing , 20)
                     
                 
@@ -66,6 +73,11 @@ extension AllGoalListView{
     }
     //MARK:- Competition List
     func CompetitionList() -> some View{
+        let h = VStack(spacing : 8) {
+        if (GoalList.goalList?.data?.count == nil){
+            Text("No Goal Data Found").padding().font(.custom("Poppins-Medium", size: 13))
+                .foregroundColor(Color.primary)
+        }else{
         
         ForEach(GoalList.goalList?.data?.indices ?? 0..<0 , id: \.self){ item in
             ZStack(alignment: .leading) {
@@ -103,6 +115,18 @@ extension AllGoalListView{
         }
             
         }
+        }
+        }
+        return h
+    }
+    //MARK:- Link to Goal View
+    private var goToGoalView : some View {
+        
+        NavigationLink(destination: SetGoalView(value: $MoveToGoalView),isActive: $MoveToGoalView,
+                       label: {
+                        Text("")
+                       })
+        
     }
 }
 

@@ -8,14 +8,19 @@
 import SwiftUI
 
 struct AddStrengthView: View {
-    @ObservedObject var addStrength = AddStrengthViewModel()
+    @ObservedObject var addStrength: AddStrengthViewModel
     @State private var Name = String()
     @State private var duration = String()
-    @State private var date = String()
-    @State private var time = String()
+    @Binding var backToRunningList: Bool
+    @State var current_date = Date()
+    @State var time = Date()
     @State private var weight = String()
     @State private var reps = String()
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    init(value: Binding<Bool>){
+        _backToRunningList = value
+        _addStrength = ObservedObject(wrappedValue: AddStrengthViewModel(showStrength: value))
+        }
     var body: some View {
         loadView()
     }
@@ -23,7 +28,7 @@ struct AddStrengthView: View {
 
 struct AddStrengthView_Previews: PreviewProvider {
     static var previews: some View {
-        AddStrengthView()
+        AddStrengthView(value: .constant(false))
     }
 }
 //    MARK:- View Extension
@@ -33,9 +38,9 @@ extension AddStrengthView{
         VStack(alignment: .center) {
             BackButtonView()
             StrengthInputData()
-            HStack(spacing: 20){
-            StrengthDateData()
-                StrengthTime()
+            HStack(spacing: 10){
+                StrengthDate()
+                TimeView()
             }.padding(.top , 6)
             DurationView()
             HStack(spacing: 20){
@@ -45,7 +50,7 @@ extension AddStrengthView{
             AddStrengthButton()
             Spacer()
             
-        }.padding().modifier(BannerModifier(model: $addStrength.model))
+        }.navigationBarHidden(true).modifier(BannerModifier(model: $addStrength.model))
         }
         
     }
@@ -68,9 +73,9 @@ extension AddStrengthView{
                 }
                 
             }).padding()
-            .padding([.leading], -30)
+//            .padding([.leading], -30)
             
-            Divider()
+            Divider().padding(.trailing , 20).padding(.leading , 20)
             
         }
     }
@@ -103,68 +108,64 @@ extension AddStrengthView{
                     
                 } // :ZStack Email
             // :ZStack Password
-            }.padding(.top , 40)
+            }.padding(.top , 40).padding(.trailing , 20).padding(.leading , 20)
     }
     //MARK:- Date View
-    fileprivate func StrengthDateData() -> some View {
+    fileprivate func StrengthDate() -> some View {
          // VStack Top Logo
             
             VStack {
                 ZStack(alignment: .leading) {
                     
-                    Rectangle()
-                        .fill(Color.white)
-                        .frame(height: 50)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
-                    
-                    
-                    
                     HStack{
+                        Text("Date")
                         
-                        TextField("Date", text: $date)
-                            
+                        .background(Color.white)
+                        .foregroundColor(Color.black)
+                      //  .padding([.trailing, .top, .bottom])
+                        .font(.custom("Poppins-Medium", size: 14))
+                        
+                        DatePicker("", selection: $current_date, displayedComponents: [.date])
                             .background(Color.white)
                             .foregroundColor(Color.black)
-                            .padding([.trailing, .top, .bottom, .leading])
+                            .padding([.trailing, .top, .bottom])
                             .font(.custom("Poppins-Regular", size: 14))
-                        
-                        
-                        
-                       
-                        
                     }
-                    
-                } // :ZStack Email
-            // :ZStack Password
-            }
+                }
+            }.padding(.leading, 20)
+            
     }
     //MARK:- Time View
-    fileprivate func StrengthTime() -> some View {
+    fileprivate func TimeView() -> some View {
          // VStack Top Logo
             
             VStack {
                 ZStack(alignment: .leading) {
                     
-                    Rectangle()
-                        .fill(Color.white)
-                        .frame(height: 50)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
+//                    Rectangle()
+//                        .fill(Color.white)
+//                        .frame(height: 50)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 3)
+//                                .stroke(Color.gray, lineWidth: 0.5)
+//                        )
                     
                     
                     
-                    HStack{
+                    HStack(spacing: 0){
+                        Text("Time")
                         
-                        TextField("Time", text: $time)
+                        .background(Color.white)
+                        .foregroundColor(Color.black)
+                      //  .padding([.trailing, .top, .bottom])
+                        .font(.custom("Poppins-Medium", size: 14))
+                        
+                        DatePicker("", selection: $time, displayedComponents: [.hourAndMinute])
                             
                             .background(Color.white)
                             .foregroundColor(Color.black)
-                            .padding([.trailing, .top, .bottom, .leading])
+                            .padding(.trailing , 20)
+//                            .padding([.trailing, .top, .bottom, .leading])
                             .font(.custom("Poppins-Regular", size: 14))
                         
                         
@@ -206,7 +207,7 @@ extension AddStrengthView{
                     
                 } // :ZStack Email
             // :ZStack Password
-            }.padding(.top , 6)
+            }.padding(.top , 6).padding(.leading , 20).padding(.trailing , 20)
     }
     //MARK:- Reps View
     fileprivate func RepsView() -> some View {
@@ -242,7 +243,7 @@ extension AddStrengthView{
                     
                 } // :ZStack Email
             // :ZStack Password
-            }
+            }.padding(.leading , 20)
     }
     //MARK:-WeightView
     fileprivate func WeightView() -> some View {
@@ -278,13 +279,19 @@ extension AddStrengthView{
                     
                 } // :ZStack Email
             // :ZStack Password
-            }
+            }.padding(.trailing , 20)
     }
     //MARK:- Add Strength Button
     fileprivate func AddStrengthButton() -> some View {
         Button(action: {
             if is_all_field_are_filled{
-                addStrength.ApiAddStrength(duration: duration, time: time, reps: reps, date: date, name: Name, weight: weight)
+                let dateFormatter = DateFormatter()
+                let timeFarmetter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                timeFarmetter.dateFormat = "h:mm a"
+                let selectedTime = timeFarmetter.string(from: time)
+                let selectedDate = dateFormatter.string(from: current_date)
+                addStrength.ApiAddStrength(duration: duration, time: selectedTime, reps: reps, date: selectedDate, name: Name, weight: weight)
             }
             
             
@@ -292,18 +299,20 @@ extension AddStrengthView{
             Text("Add Strength")
                 .frame(maxWidth: .infinity/*@END_MENU_TOKEN@*/, maxHeight: 60, alignment: /*@START_MENU_TOKEN@*/.center)
                 .font(.custom("Poppins-Bold", size: 14))
-                .background(Color("fg"))
+                
                 .foregroundColor(Color.white)
-                .cornerRadius(5)
+               
             
             
         })
+        .background(Color("fg"))
+        .cornerRadius(5)
         .frame( height: 50)
-        .padding([.top], 200)
+        .padding([.top], 200).padding(.trailing , 20).padding(.leading , 20)
     }
     //MARK:- Check all fields are filled
     var is_all_field_are_filled:  Bool{
-        if (duration.isEmpty || date.isEmpty || time.isEmpty || reps.isEmpty || Name.isEmpty){
+        if (duration.isEmpty ||  reps.isEmpty || Name.isEmpty){
             
             addStrength.model = BannerData(title: "All fields are required", message: "", color: .red, image: "error")
             return false

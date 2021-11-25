@@ -27,10 +27,31 @@
 		<key>NSExtensionAttributes</key>
 		<dict>
 			<key>WKAppBundleIdentifier</key>
-			<string>com.MegaXtudio.NoDoubts.watchkitapp</string>
+			<string>com.mega.NoDoubts.watchkitapp</string>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.watchkit</string>
 	</dict>
+	<key>NSHealthShareUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to capture a snap shot of your heart rate</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to update your health usage with heart rate data.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>NSLocationUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Poppins-Regular.ttf</string>
+		<string>Poppins-Bold.ttf</string>
+		<string>Poppins-Medium.ttf</string>
+		<string>Poppins-SemiBold.ttf</string>
+	</array>
+	<key>WKRunsIndependentlyOfCompanionApp</key>
+	<true/>
 </dict>
 </plist>

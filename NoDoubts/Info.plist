@@ -16,10 +16,29 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.99295727751-u8q59cd68u35lnaiqood5j1ragnp3phl</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need your camera for display display picture</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Required to gain permission to access location services</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Required to gain permission to access location services</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Required to gain permission to access location services</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Poppins-Regular.ttf</string>

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GoogleSignIn
 
 struct LoginView: View {
     
@@ -13,6 +14,8 @@ struct LoginView: View {
     @State private var email = String()
     @State private var password = String()
     @State private var secured: Bool = true
+    let googleSignIn = GIDSignIn.sharedInstance
+    @ObservedObject var myGoogle = GoogleStuff()
     @State private var isEmailValid : Bool   = true
     @State private var movetoSingUpLink: Bool = false
     @State private var movetoForgotPassworView: Bool = false
@@ -22,6 +25,7 @@ struct LoginView: View {
     private var navigationLinksStacks: some View {
         
         VStack {
+            
             NavigationLink(
                 destination: SignUpView(),
                 isActive: $movetoSingUpLink,
@@ -65,6 +69,7 @@ extension LoginView {
         LoadingView(isShowing: $Login.loading) {
             NavigationView {
                 VStack(alignment: .center) {
+                    ScrollView(showsIndicators: false){
                     
                     VStack (spacing: 30) {
                         LogoData()
@@ -79,6 +84,15 @@ extension LoginView {
                 }.padding()
                 .navigationBarHidden(true)
                 
+                }.onChange(of: myGoogle.doneGettingData, perform: { value in
+                    if value{
+                        let name = myGoogle.googleFirstName
+                        let email = myGoogle.googleEmail
+                        let token = myGoogle.googleIdToken
+                        myGoogle.doneGettingData = false
+                        Login.APISocialLogin(social_key: "google", email: email, name: name, social_token: token)
+                    }
+                })
             }
         }
     }
@@ -125,14 +139,14 @@ extension LoginView {
                             .padding([.leading], 20)
                         
                         TextField("Your Email", text: $email)
-                            .onChange(of: email, perform: { value in
-                                //                        check is email formate is valid.
-                                if self.textFieldValidatorEmail(value) {
-                                    self.isEmailValid = true
-                                } else {
-                                    self.isEmailValid = false
-                                }
-                            })
+//                            .onChange(of: email, perform: { value in
+//                                //                        check is email formate is valid.
+//                                if self.textFieldValidatorEmail(value) {
+//                                    self.isEmailValid = true
+//                                } else {
+//                                    self.isEmailValid = false
+//                                }
+//                            })
                             
                             .background(Color.white)
                             .foregroundColor(Color.black)
@@ -159,7 +173,7 @@ extension LoginView {
                             .frame(width: 24, height: 24, alignment: .center)
                             .padding([.leading], 20)
                         
-                        TextField("Password", text: $password)
+                        SecureField("Password", text: $password)
                             .background(Color.white)
                             .foregroundColor(Color.black)
                             .padding([.trailing, .top, .bottom])
@@ -182,12 +196,13 @@ extension LoginView {
             Text("Sign In")
                 .frame(maxWidth: .infinity/*@END_MENU_TOKEN@*/, maxHeight: 60, alignment: /*@START_MENU_TOKEN@*/.center)
                 .font(.custom("Poppins-Bold", size: 16))
-                .background(Color("fg"))
                 .foregroundColor(Color.white)
-                .cornerRadius(10)
+                
             
             
         })
+         .background(Color("fg"))
+         .cornerRadius(10)
          .frame( height: 50)
          .padding([.top], 25)
     }
@@ -223,7 +238,11 @@ extension LoginView {
             HStack {
                 
                 Button(action: {
-                    print("google button")
+                    self.googleSignIn()?.presentingViewController =
+                        UIApplication.shared.windows.first?.rootViewController
+                    self.googleSignIn()?.clientID = "99295727751-u8q59cd68u35lnaiqood5j1ragnp3phl.apps.googleusercontent.com" //It is just a playground for now
+                    self.googleSignIn()?.delegate = self.myGoogle
+                    self.googleSignIn()?.signIn()
                 }, label: {
                     HStack{
                         Image("Google")
@@ -292,22 +311,10 @@ extension LoginView {
             Login.model = BannerData(title: "Error", message: "Please fill all the fields", color: .red, image: "error")
             return false
         } else {
-            //      If all fields are filled then check the check the email and password fields
-            if self.isEmailValid {
-                //                if email is valid then check that both passwords filed are same
-                if is_password_length_satisfied() {
-                    return true
-                }
-              
-                
-            } else {
-                //                if email formate is not valid.
-                Login.model = BannerData(title: "Error", message: "Email formate incorrect", color: .red, image: "error")
-                return false
-            }
+           return true
             
         }
-        return false
+       
     }
         
         func is_password_length_satisfied() -> Bool {
@@ -333,4 +340,5 @@ extension LoginView {
         let emailPredicate = NSPredicate(format:"SELF MATCHES %@", emailFormat)
         return emailPredicate.evaluate(with: string)
     }
+    
 }

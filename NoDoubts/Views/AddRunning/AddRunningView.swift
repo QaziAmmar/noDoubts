@@ -11,9 +11,16 @@ struct AddRunningView: View {
     @State private var averageSpeed = String()
     @State private var distance = String()
     @State private var date = String()
-    @State private var time = String()
-    @ObservedObject var addRunning = AddRunningViewModel()
+    @State var current_date = Date()
+    @State var time = Date()
+    @Binding var backToRunningList: Bool
+//    @State private var time = String()
+    @ObservedObject var addRunning : AddRunningViewModel
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    init(value: Binding<Bool>){
+        _backToRunningList = value
+        _addRunning = ObservedObject(wrappedValue: AddRunningViewModel(showHomePa: value))
+        }
     var body: some View {
         loadView()
     }
@@ -21,7 +28,7 @@ struct AddRunningView: View {
 
 struct AddRunningView_Previews: PreviewProvider {
     static var previews: some View {
-        AddRunningView()
+        AddRunningView(value: .constant(false))
     }
 }
 //    MARK:- View Extension
@@ -31,7 +38,7 @@ extension AddRunningView{
         VStack(alignment: .center) {
             BackButtonView()
             RunningInputData()
-            HStack(spacing: 20){
+            HStack(spacing: 10){
                 RunningDateView()
                 RunningTimeView()
             }.padding(.top , 6)
@@ -40,7 +47,7 @@ extension AddRunningView{
             AddRunningButton()
             Spacer()
             
-        }.padding().modifier(BannerModifier(model: $addRunning.model))
+        }.navigationBarHidden(true).modifier(BannerModifier(model: $addRunning.model))
         }
         
     }
@@ -48,24 +55,29 @@ extension AddRunningView{
     fileprivate func BackButtonView() -> some View {
         
         VStack(alignment: .leading) {
+            HStack{
             Button(action: {
                 presentationMode.wrappedValue.dismiss()
             }, label: {
-                HStack{
+               
                     Image("back_arrow")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 30, alignment: .center)
+            })
+           
                     Text("Running")
                         .font(.custom("Poppins-Bold", size: 16))
                         .foregroundColor(Color("head"))
-                   
-                }
                 
-            }).padding()
-            .padding([.leading], -30)
+                
+                Spacer()
+                    
+                
+        }.frame(minWidth : 0 , maxWidth: .infinity ,alignment: .leading)
             
-            Divider()
+            
+            Divider().padding([.leading] , 20)
             
         }
     }
@@ -98,7 +110,7 @@ extension AddRunningView{
                     
                 } // :ZStack Email
             // :ZStack Password
-            }.padding(.top , 40)
+            }.padding(.top , 40).padding(.trailing , 20).padding(.leading , 20)
     }
     //MARK:- Date View
     fileprivate func RunningDateView() -> some View {
@@ -107,34 +119,27 @@ extension AddRunningView{
             VStack {
                 ZStack(alignment: .leading) {
                     
-                    Rectangle()
-                        .fill(Color.white)
-                        .frame(height: 50)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
+                    
                     
                     
                     
                     HStack{
+                        Text("Date")
                         
-                        TextField("Date", text: $date)
-                            
+                        .background(Color.white)
+                        .foregroundColor(Color.black)
+                      //  .padding([.trailing, .top, .bottom])
+                        .font(.custom("Poppins-Medium", size: 14))
+                        
+                        DatePicker("", selection: $current_date, displayedComponents: [.date])
                             .background(Color.white)
                             .foregroundColor(Color.black)
-                            .padding([.trailing, .top, .bottom, .leading])
+                            .padding([.trailing, .top, .bottom])
                             .font(.custom("Poppins-Regular", size: 14))
-                        
-                        
-                        
-                       
-                        
                     }
-                    
-                } // :ZStack Email
-            // :ZStack Password
-            }
+                }
+            }.padding(.leading, 20)
+            
     }
     //MARK:- Time View
     fileprivate func RunningTimeView() -> some View {
@@ -143,23 +148,30 @@ extension AddRunningView{
             VStack {
                 ZStack(alignment: .leading) {
                     
-                    Rectangle()
-                        .fill(Color.white)
-                        .frame(height: 50)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.gray, lineWidth: 0.5)
-                        )
+//                    Rectangle()
+//                        .fill(Color.white)
+//                        .frame(height: 50)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 3)
+//                                .stroke(Color.gray, lineWidth: 0.5)
+//                        )
                     
                     
                     
-                    HStack{
+                    HStack(spacing: 0){
+                        Text("Time")
                         
-                        TextField("Time", text: $time)
+                        .background(Color.white)
+                        .foregroundColor(Color.black)
+                      //  .padding([.trailing, .top, .bottom])
+                        .font(.custom("Poppins-Medium", size: 14))
+                        
+                        DatePicker("", selection: $time, displayedComponents: [.hourAndMinute])
                             
                             .background(Color.white)
                             .foregroundColor(Color.black)
-                            .padding([.trailing, .top, .bottom, .leading])
+                            .padding(.trailing , 20)
+//                            .padding([.trailing, .top, .bottom, .leading])
                             .font(.custom("Poppins-Regular", size: 14))
                         
                         
@@ -201,32 +213,42 @@ extension AddRunningView{
                     
                 } // :ZStack Email
             // :ZStack Password
-            }.padding(.top , 6)
+            }.padding(.top , 6).padding(.trailing , 20).padding(.leading , 20)
     }
     //MARK:- Add Running Button
     fileprivate func AddRunningButton() -> some View {
         Button(action: {
             if is_all_field_are_filled{
-                addRunning.addRunningApi(distance: distance, time: time, average_speed: averageSpeed, date: date)
+                let dateFormatter = DateFormatter()
+                let timeFarmetter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                timeFarmetter.dateFormat = "h:mm a"
+                let selectedTime = timeFarmetter.string(from: time)
+                let selectedDate = dateFormatter.string(from: current_date)
+                addRunning.addRunningApi(distance: distance, time: selectedTime, average_speed: averageSpeed, date: selectedDate)
             }
             
             
         }, label: {
             Text("Add Running")
-                .frame(maxWidth: .infinity/*@END_MENU_TOKEN@*/, maxHeight: 60, alignment: /*@START_MENU_TOKEN@*/.center)
-                .font(.custom("Poppins-Bold", size: 14))
-                .background(Color("fg"))
+                .frame(maxWidth: .infinity/*@
+                       3@*/, maxHeight: 60, alignment: /*@START_MENU_TOKEN@*/.center)
+                .font(.custom("Poppins-Bold", size: 16))
                 .foregroundColor(Color.white)
-                .cornerRadius(5)
+                .frame(height: 55)
+                  
             
             
         })
-        .frame( height: 50)
-        .padding([.top], 200)
+        .background(Color("fg"))
+        .cornerRadius(6)
+        .frame(height : 55)
+        .padding([.top ] ,200).padding(.trailing , 20).padding(.leading , 20)
+        
     }
     //MARK:- Check all fields are filled
     var is_all_field_are_filled:  Bool{
-        if (distance.isEmpty || date.isEmpty || time.isEmpty || averageSpeed.isEmpty){
+        if (distance.isEmpty ||  averageSpeed.isEmpty){
             
             addRunning.model = BannerData(title: "All fields are required", message: "", color: .red, image: "error")
             return false

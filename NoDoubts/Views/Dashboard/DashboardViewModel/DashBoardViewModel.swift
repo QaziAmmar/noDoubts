@@ -10,7 +10,9 @@ class DashBoardViewModel: ObservableObject{
     @Published var Dash : DashboardModel?
     @Published var loading = false
     @Published var model: BannerData?
-    //@Published  var movetoDashboard: Bool = false
+    @Published var isCalledApi: Bool = true
+    @Published var isUpdate: Bool = false
+    
     
     func loadJson(from decoder: Decoder ) throws {
         
@@ -19,10 +21,15 @@ class DashBoardViewModel: ObservableObject{
     
     //MARK:- getDashBoard Data Api
     func ApiDashBoard(){
-        
+        isCalledApi = false
             loading = true
-            
-            ApiManager.URLResponse("api/Users/dashboard?user_id=20", method: .get, parameters: nil, headers: nil) { competitions in
+        guard let profile = AppHelper.helper.loadMyUser() else {
+            print("No user")
+            return
+        }
+        let userId = profile.data?.id ?? ""
+        
+            ApiManager.URLResponse("api/Users/dashboard?user_id=\(userId)", method: .get, parameters: nil, headers: nil) { competitions in
                 //            parse login data
                 do {
                     let decoder = JSONDecoder()
@@ -31,11 +38,12 @@ class DashBoardViewModel: ObservableObject{
                     if competitionsModels.status == 1 {
                         self.loading = false
                         print(competitionsModels)
+                        self.isUpdate = true
                         self.Dash = competitionsModels
-//                        self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
+//                  r
                     } else {
                         //                    show error
-//                        self.model = BannerData(title: competitionsModels.message ?? "", message: competitionsModels.message, color: .red, image: "error")
+
                     }
                 } catch let error {
                     self.loading = false

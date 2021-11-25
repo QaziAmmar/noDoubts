@@ -22,8 +22,13 @@ class RunningViewModel: ObservableObject{
     ){
         
             loading = true
+        guard let profile = AppHelper.helper.loadMyUser() else {
+            print("No user")
+            return
+        }
+        let userId = profile.data?.id ?? ""
             
-            ApiManager.URLResponse("api/Workout/running?user_id=20", method: .get, parameters: nil, headers: nil) { competitions in
+            ApiManager.URLResponse("api/Workout/running?user_id=\(userId)", method: .get, parameters: nil, headers: nil) { competitions in
                 //            parse login data
                 do {
                     let decoder = JSONDecoder()
@@ -35,8 +40,9 @@ class RunningViewModel: ObservableObject{
                         self.Running = competitionsModels
 //                        self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
                     } else {
+                        self.loading = false
                         //                    show error
-                        self.model = BannerData(title: competitionsModels.message ?? "", message: competitionsModels.message, color: .red, image: "error")
+//                        self.model = BannerData(title: competitionsModels.message ?? "", message: competitionsModels.message, color: .red, image: "error")
                     }
                 } catch let error {
                     self.loading = false

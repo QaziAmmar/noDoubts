@@ -20,13 +20,21 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>NSLocationUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location for set competiton on watch</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>WKCompanionAppBundleIdentifier</key>
-	<string>com.MegaXtudio.NoDoubts</string>
+	<string>com.mega.NoDoubts</string>
 	<key>WKWatchKitApp</key>
 	<true/>
 </dict>

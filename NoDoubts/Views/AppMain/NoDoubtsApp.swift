@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct NoDoubtsApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
         WindowGroup {
             if AppHelper.helper.loadMyUser() != nil{

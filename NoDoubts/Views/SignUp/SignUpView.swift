@@ -18,18 +18,35 @@ struct SignUpView: View {
     @State private var password = String()
     @State private var password_again = String()
     @State private var secured: Bool = true
+    @State private var isCalledApi: Bool = true
     @State private var isEmailValid : Bool   = true
     @State private var movetoSingUpLink: Bool = false
     @State private var isShowingLoader = false
+    @State private var fitnessLvelPicker = false
+    @State private var fitneslvl = String()
+    @State private var moveToDash = false
     @State var model: BannerData?
+    @ObservedObject var myGoogle = GoogleStuff()
+    @ObservedObject var SignUp = SignUpViewModel()
+    static var uniqueKey: String {
+            UUID().uuidString
+        }
+    static let options: [DropdownOption] = [
+            DropdownOption(key: uniqueKey, value: "Cardiovascular Endurance"),
+            DropdownOption(key: uniqueKey, value: "Muscular Strength"),
+            DropdownOption(key: uniqueKey, value: "Muscular endurance"),
+            DropdownOption(key: uniqueKey, value: "Flexibility"),
+            DropdownOption(key: uniqueKey, value: "Body Composition"),
+            
+        ]
     
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     private var movetoSignUp: some View {
         NavigationLink(
-            destination: SignUpView(),
-            isActive: $movetoSingUpLink,
+            destination: DashboardView(),
+            isActive: $moveToDash,
             label: {
                 Text("")
             })
@@ -37,7 +54,7 @@ struct SignUpView: View {
     
     var body: some View {
         loadView()
-            .modifier(BannerModifier(model: $model))
+            .modifier(BannerModifier(model: $SignUp.model))
     }
 }
 
@@ -51,19 +68,29 @@ struct SignUpView_Previews: PreviewProvider {
 extension SignUpView {
     
     func loadView() -> some View {
-        LoadingView(isShowing: $isShowingLoader) {
+        LoadingView(isShowing: $SignUp.loading) {
                 VStack(alignment: .center) {
+                    ScrollView(showsIndicators: false){
                     
                     VStack (spacing: 30) {
                         LogoData()
                         SingInTextField() //:VStack TextField
                     }
-                    SignInButton()
-                    OR_Divider()
-                    GmailButton() //ZStack: Gmail Button
+//
+                        movetoSignUp
+                     //ZStack: Gmail Button
                     SignIn() //VStack: Forgot Password
+                }
                     
-                }.padding()
+                }.onChange(of: myGoogle.doneGettingData, perform: { value in
+                    if value{
+                        let name = myGoogle.googleFirstName
+                        let email = myGoogle.googleEmail
+                        let token = myGoogle.googleIdToken
+                        myGoogle.doneGettingData = false
+                        SignUp.APISocialLogin(social_key: "google", email: email, name: name, social_token: token)
+                    }
+                }).padding()
                 .navigationBarHidden(true)
                 
             
@@ -141,7 +168,14 @@ extension SignUpView {
                             .background(Color.white)
                             .foregroundColor(Color.black)
                             .padding([.trailing, .top, .bottom])
-                            .font(.custom("Poppins-Regular", size: 14))
+                            .font(.custom("Poppins-Regular", size: 14)).onChange(of: email, perform: { value in
+                                //                        check is email formate is valid.
+                                if self.textFieldValidatorEmail(value) {
+                                    self.isEmailValid = true
+                                } else {
+                                    self.isEmailValid = false
+                                }
+                            })
                     }
                     
                 } // :ZStack Password
@@ -163,15 +197,7 @@ extension SignUpView {
                             .frame(width: 24, height: 24, alignment: .center)
                             .padding([.leading], 20)
                         
-                        TextField("Password", text: $password)
-                            .onChange(of: email, perform: { value in
-                                //                        check is email formate is valid.
-                                if self.textFieldValidatorEmail(value) {
-                                    self.isEmailValid = true
-                                } else {
-                                    self.isEmailValid = false
-                                }
-                            })
+                        SecureField("Password", text: $password)
                             
                             .background(Color.white)
                             .foregroundColor(Color.black)
@@ -205,25 +231,51 @@ extension SignUpView {
                             .font(.custom("Poppins-Regular", size: 14))
                     }
                     
-                } // :ZStack Password
+                }
+               
+                ZStack(alignment: .top){
+                    VStack{
+              
+                            DropdownSelector(
+                                placeholder: "Fitness Level",
+                                options: SignUpView.options,
+                                onOptionSelected: { option in
+                                    print(option)
+                                    fitneslvl = option.value
+                                }).zIndex(1)
+//                            .padding(.horizontal)
+   
+                   SignInButton()
+                        OR_Divider()
+                        GmailButton()
+                    }
+                }
+                
+                
+                
             }
     }
     
     fileprivate func SignInButton() -> some View {
          Button(action: {
             
-            is_field_are_empty()
+            if is_field_are_empty{
+                SignUp.ApiCalling(name: fullName, email: email, password: password, FitnesLvl: fitneslvl)
+            }
+           
             
         }, label: {
-            Text("Sign In")
+            Text("Sign Up")
                 .frame(maxWidth: .infinity/*@END_MENU_TOKEN@*/, maxHeight: 60, alignment: /*@START_MENU_TOKEN@*/.center)
                 .font(.custom("Poppins-Bold", size: 16))
-                .background(Color("fg"))
+                
                 .foregroundColor(Color.white)
-                .cornerRadius(10)
+              
             
             
         })
+         .background(Color("fg"))
+         .cornerRadius(10)
          .frame( height: 50)
          .padding([.top], 25)
     }
@@ -309,15 +361,17 @@ extension SignUpView {
 // MARK: CUTSOM FUNCTION EXTENSION
 extension SignUpView {
     
-    func is_field_are_empty() {
+    var is_field_are_empty:  Bool {
         
         if  email.isEmpty || password.isEmpty  {
-            model = BannerData(title: "Error", message: "Please fill all the fields", color: .red, image: "error")
+            SignUp.model = BannerData(title: "Error", message: "Please fill all the fields", color: .red, image: "error")
+            return false
         } else {
             //      If all fields are filled then check the check the email and password fields
             if self.isEmailValid {
                 //                if email is valid then check that both passwords filed are same
                 if is_password_length_satisfied() {
+                    return true
                     
                     
                     
@@ -327,10 +381,12 @@ extension SignUpView {
                 
             } else {
                 //                if email formate is not valid.
-                model = BannerData(title: "Error", message: "Email formate incorrect", color: .red, image: "error")
+                SignUp.model = BannerData(title: "Error", message: "Email formate incorrect", color: .red, image: "error")
+                return false
             }
             
         }
+        return false
     }
         
         func is_password_length_satisfied() -> Bool {
@@ -340,13 +396,13 @@ extension SignUpView {
                 if password == password_again{
                     return true
                 }else{
-                    model = BannerData(title: "Error", message: "Password not matched", color: .red, image: "error")
+                    SignUp.model = BannerData(title: "Error", message: "Password not matched", color: .red, image: "error")
                     return false
                 }
                
                 
             } else {
-                model = BannerData(title: "Error", message: "Please enter atleast 6 character of password", color: .red, image: "error")
+                SignUp.model = BannerData(title: "Error", message: "Please enter atleast 6 character of password", color: .red, image: "error")
                 return false
             }
         

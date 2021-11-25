@@ -7,6 +7,8 @@ target 'NoDoubts' do
 
   # Pods for NoDoubts
 pod 'SDWebImageSwiftUI'
+pod 'GoogleMaps'
+pod 'GoogleSignIn','5.0.0'
 
   target 'NoDoubtsTests' do
     inherit! :search_paths

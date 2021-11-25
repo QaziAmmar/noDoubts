@@ -20,8 +20,13 @@ func loadJson(from decoder: Decoder ) throws {
 func ApiGoalList(){
     
         loading = true
+    guard let profile = AppHelper.helper.loadMyUser() else {
+        print("No user")
+        return
+    }
+    let userId = profile.data?.id ?? ""
         
-        ApiManager.URLResponse("api/Workout/goal?user_id=20", method: .get, parameters: nil, headers: nil) { competitions in
+        ApiManager.URLResponse("api/Workout/goal?user_id=\(userId)", method: .get, parameters: nil, headers: nil) { competitions in
             //            parse login data
             do {
                 let decoder = JSONDecoder()
@@ -31,10 +36,10 @@ func ApiGoalList(){
                     self.loading = false
                     print(GoalListModel)
                     self.goalList = GoalListModel
-//                        self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
+//                       
                 } else {
-                    //                    show error
-                    self.model = BannerData(title: GoalListModel.message ?? "", message: GoalListModel.message, color: .red, image: "error")
+                    self.loading = false
+//
                 }
             } catch let error {
                 self.loading = false

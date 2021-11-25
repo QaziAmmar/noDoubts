@@ -6,18 +6,28 @@
 //
 
 import Foundation
+import SwiftUI
 class AddRunningViewModel: ObservableObject {
     @Published var addRunng : addRunningModel?
     @Published var loading = false
+    @Binding var showAddRunning: Bool
     @Published var model: BannerData?
-  
+    init(showHomePa: Binding<Bool>) {
+        _showAddRunning = showHomePa
+    }
     
     
-    //MARK:- SignUp Api
+    //MARK:- AddRunning Api
     func addRunningApi(distance: String, time: String, average_speed: String, date: String){
         
+        
             loading = true
-        let param = ["user_id": "19",
+        guard let profile = AppHelper.helper.loadMyUser() else {
+            print("No user")
+            return
+        }
+        let userId = profile.data?.id ?? ""
+        let param = ["user_id": userId,
                      "distance": distance,
                      "time": time,
                      "date": date,
@@ -34,8 +44,9 @@ class AddRunningViewModel: ObservableObject {
                         self.loading = false
                         print(competitionsModels)
                         self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
+                        self.showAddRunning.toggle()
                     } else {
-                        //                    show error
+                        self.loading = false
                         self.model = BannerData(title: competitionsModels.message ?? "", message: competitionsModels.message, color: .red, image: "error")
                     }
                 } catch let error {
@@ -49,4 +60,5 @@ class AddRunningViewModel: ObservableObject {
                 print("\(error)")
             }
     }
+    
 }

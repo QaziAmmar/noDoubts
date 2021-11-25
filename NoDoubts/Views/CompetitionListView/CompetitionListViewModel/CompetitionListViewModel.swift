@@ -21,8 +21,13 @@ class CompetitionListViewModel: ObservableObject{
     func ApiCalling(){
         
             loading = true
+        guard let profile = AppHelper.helper.loadMyUser() else {
+            print("No user")
+            return
+        }
+        let userId = profile.data?.id ?? ""
             
-            ApiManager.URLResponse("api/Workout/competition?user_id=20", method: .get, parameters: nil, headers: nil) { competitions in
+            ApiManager.URLResponse("api/Workout/competition?user_id=\(userId)", method: .get, parameters: nil, headers: nil) { competitions in
                 //            parse login data
                 do {
                     let decoder = JSONDecoder()
@@ -32,10 +37,10 @@ class CompetitionListViewModel: ObservableObject{
                         self.loading = false
                         print(competitionsModels)
                         self.Comp = competitionsModels
-                        self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
+//                        self.model = BannerData(title:  competitionsModels.message ?? "", message: competitionsModels.message, color: .green, image: "success")
                     } else {
-                        //                    show error
-                        self.model = BannerData(title: competitionsModels.message ?? "", message: competitionsModels.message, color: .red, image: "error")
+                        self.loading = false
+//                        self.model = BannerData(title: competitionsModels.message ?? "", message: competitionsModels.message, color: .red, image: "error")
                     }
                 } catch let error {
                     self.loading = false

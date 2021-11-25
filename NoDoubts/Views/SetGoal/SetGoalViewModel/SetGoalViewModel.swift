@@ -6,17 +6,26 @@
 //
 
 import Foundation
+import SwiftUI
 class SetGoalViewModel : ObservableObject{
     @Published var SetGoal : SetGoalViewModel?
     @Published var loading = false
+    @Binding var showGoal: Bool
     @Published var model: BannerData?
     @Published  var movetoDashboard: Bool = false
+    init(showGoal: Binding<Bool>) {
+        _showGoal = showGoal
+    }
     
     //MARK:- API
     func setGoalApi(name: String , description: String){
         
             loading = true
-            let parameters = ["user_id": "19",
+        guard let profile = AppHelper.helper.loadMyUser() else{
+            return
+        }
+        let userId = profile.data?.id ?? ""
+            let parameters = ["user_id": userId,
                               "name": name,
                               "description": description
             ] as [String : Any]
@@ -31,6 +40,7 @@ class SetGoalViewModel : ObservableObject{
                         self.loading = false
                         print(loginModel)
                         self.model = BannerData(title:  loginModel.message ?? "", message: loginModel.message, color: .green, image: "success")
+                        self.showGoal.toggle()
                     } else {
                         //                    show error
                         self.model = BannerData(title: loginModel.message ?? "", message: loginModel.message, color: .red, image: "error")

@@ -11,8 +11,13 @@ struct SetGoalView: View {
     @State private var Name = String()
     @State private var descriptionName = "Description"
     @State private var placeholderString = "Description"
-    @ObservedObject var setGoal = SetGoalViewModel()
+    @Binding var backToList: Bool
+    @ObservedObject var setGoal : SetGoalViewModel
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    init(value: Binding<Bool>){
+        _backToList = value
+        _setGoal = ObservedObject(wrappedValue: SetGoalViewModel(showGoal: value))
+        }
     var body: some View {
         LoadingView(isShowing: $setGoal.loading) {
             VStack{
@@ -21,7 +26,7 @@ struct SetGoalView: View {
                 Description()
                 SetGHoalButton()
                 Spacer()
-            } .modifier(BannerModifier(model: $setGoal.model))
+            }.navigationBarHidden(true) .modifier(BannerModifier(model: $setGoal.model))
         }
     }
     //MARK:- Back Button
@@ -123,12 +128,14 @@ struct SetGoalView: View {
             Text("Set Goal")
                 .frame(maxWidth: .infinity/*@END_MENU_TOKEN@*/, maxHeight: 60, alignment: /*@START_MENU_TOKEN@*/.center)
                 .font(.custom("Poppins-Bold", size: 16))
-                .background(Color("fg"))
+               
                 .foregroundColor(Color.white)
-                .cornerRadius(6)
+                
             
             
         })
+         .background(Color("fg"))
+         .cornerRadius(6)
          .frame( height: 55)
          .padding([.top], 130).padding([.leading , .trailing] , 16)
     }
@@ -145,7 +152,8 @@ struct SetGoalView: View {
 
 struct SetGoalView_Previews: PreviewProvider {
     static var previews: some View {
-        SetGoalView()
+        SetGoalView(value: .constant(false  ))
     }
     
 }
+
